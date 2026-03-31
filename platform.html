@@ -8,6 +8,7 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script crossorigin src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #FAF7F2; overflow: hidden; }
@@ -28,6 +29,20 @@
   <script type="text/babel" data-presets="react">
     const { useState, useEffect, useRef } = React;
 
+// Supabase Auth
+const SUPABASE_URL = 'https://fjzpvatjjcgulfowuuqt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqenB2YXRqamNndWxmb3d1dXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzAxMjUsImV4cCI6MjA5MDUwNjEyNX0.kJutDnrmXVnTtm1jZrAUv1YkFv3QVdAULBo92stYNzM';
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Auth guard — redirect to login if no session
+(async () => {
+    const isDevMode = new URLSearchParams(window.location.search).has('dev');
+    if (isDevMode) return;
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (!session) {
+        window.location.href = 'index.html';
+    }
+})();
 
 const tokens = {
   color: {
@@ -2306,9 +2321,40 @@ const ProfileSection = ({ user, onUpdate }) => {
 function LadoPlatform() {
   const [activeSection, setActiveSection] = useState("home");
   const [user, setUser] = useState(MOCK_USER);
+  const [authSession, setAuthSession] = useState(null);
   const [forwardedItems, setForwardedItems] = useState([
     { id: "fwd-1", missionName: "Launch Etsy Print-on-Demand Store", deliverables: ["5 product designs", "SEO-optimized listings", "Product photography"], suggestedChannel: "Etsy", suggestedPrice: 24.99, platformFee: "6.5% + $0.20", productionCost: 8.50, projectedMargin: 14.67, status: "quote", forwardedDate: "Mar 29" },
   ]);
+
+  // Load real user data from Supabase on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) return;
+        setAuthSession(session);
+        const { data: profile } = await _supabase.from('users').select('*').eq('id', session.user.id).single();
+        if (profile) {
+          setUser({
+            name: profile.name || MOCK_USER.name,
+            ladoName: profile.lado_name || 'Atlas',
+            currentJob: profile.current_job || '',
+            skills: profile.skills || [],
+            hoursPerWeek: profile.hours_per_week || 0,
+            budget: profile.budget_tier || 'starter',
+            monthlyIncome: profile.monthly_income || 0,
+            monthlyExpenses: profile.monthly_expenses || 0,
+            currentSavings: profile.current_savings || 0,
+            sideHustleIncome: profile.side_hustle_income || 0,
+            channel: profile.channel || 'web',
+            joinedDate: profile.created_at ? profile.created_at.split('T')[0] : MOCK_USER.joinedDate,
+            confidenceScore: MOCK_USER.confidenceScore,
+            employerDependency: MOCK_USER.employerDependency,
+          });
+        }
+      } catch (e) { console.error('Failed to load user profile:', e); }
+    })();
+  }, []);
 
   const handleForwardToMarketplace = (item) => {
     setForwardedItems([...forwardedItems, { ...item, id: `fwd-${Date.now()}`, status: "quote", forwardedDate: "Mar 30" }]);

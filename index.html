@@ -7,6 +7,7 @@
     <meta name="description" content="LADO helps you escape your 9-to-5 through AI-powered side hustle intelligence, execution, and financial formalization.">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         * {
@@ -1658,35 +1659,105 @@
             document.getElementById('signupView').style.display = view === 'signup' ? 'block' : 'none';
         }
 
-        function handleGoogleAuth() {
-            // Placeholder: will wire to Supabase Auth with Google OAuth
-            alert('Google authentication will be connected to Supabase. Redirecting to onboarding...');
-            window.location.href = 'onboarding.html';
+        // Supabase Auth
+        const SUPABASE_URL = 'https://fjzpvatjjcgulfowuuqt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqenB2YXRqamNndWxmb3d1dXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzAxMjUsImV4cCI6MjA5MDUwNjEyNX0.kJutDnrmXVnTtm1jZrAUv1YkFv3QVdAULBo92stYNzM';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function handleGoogleAuth() {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin + '/onboarding.html' }
+            });
+            if (error) alert('Google auth error: ' + error.message);
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            // Placeholder: will wire to Supabase Auth
-            console.log('Login:', { email });
-            window.location.href = 'platform.html';
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Logging in...';
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    alert(error.message);
+                    btn.disabled = false;
+                    btn.textContent = 'Log In';
+                    return;
+                }
+                // Check if onboarding is complete
+                const { data: profile } = await supabase.from('users').select('onboarding_complete').eq('id', data.user.id).single();
+                if (profile && profile.onboarding_complete) {
+                    window.location.href = 'platform.html';
+                } else {
+                    window.location.href = 'onboarding.html';
+                }
+            } catch (err) {
+                alert('Login failed. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Log In';
+            }
         }
 
-        function handleSignup(e) {
+        async function handleSignup(e) {
             e.preventDefault();
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
-            // Placeholder: will wire to Supabase Auth
-            console.log('Signup:', { name, email });
-            window.location.href = 'onboarding.html';
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Creating account...';
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: { data: { name } }
+                });
+                if (error) {
+                    alert(error.message);
+                    btn.disabled = false;
+                    btn.textContent = 'Create Account';
+                    return;
+                }
+                // Create user profile
+                if (data.user) {
+                    await supabase.from('users').insert({
+                        id: data.user.id,
+                        name: name,
+                        email: email,
+                        lado_name: 'Atlas',
+                        budget_tier: 'starter',
+                    });
+                }
+                window.location.href = 'onboarding.html';
+            } catch (err) {
+                alert('Signup failed. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
         }
 
         // Close modal on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeAuthModal();
         });
+
+        // Auto-redirect if already logged in
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                const { data: profile } = await supabase.from('users').select('onboarding_complete').eq('id', session.user.id).single();
+                if (profile && profile.onboarding_complete) {
+                    window.location.href = 'platform.html';
+                } else {
+                    window.location.href = 'onboarding.html';
+                }
+            }
+        })();
     </script>
 </body>
 </html>

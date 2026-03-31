@@ -8,6 +8,7 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script crossorigin src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #FAF7F2; overflow: hidden; }
@@ -28,6 +29,10 @@
   <script type="text/babel" data-presets="react">
     const { useState, useEffect, useRef } = React;
 
+// Supabase Auth
+const SUPABASE_URL = 'https://fjzpvatjjcgulfowuuqt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqenB2YXRqamNndWxmb3d1dXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzAxMjUsImV4cCI6MjA5MDUwNjEyNX0.kJutDnrmXVnTtm1jZrAUv1YkFv3QVdAULBo92stYNzM';
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── Design Tokens (LADO Brand Guide) ───
 const tokens = {
@@ -1159,7 +1164,23 @@ function OnboardingWizard() {
             readinessScore={readinessScore}
             runwaySavings={runwaySavings}
             salaryTarget={salaryTarget}
-            onGo={() => alert("Launching your Lado! (This would navigate to the main dashboard)")}
+            onGo={async () => {
+                const { data: { session } } = await _supabase.auth.getSession();
+                if (session) {
+                    await _supabase.from('users').update({
+                        current_job: situation.currentJob,
+                        skills: situation.skills,
+                        hours_per_week: parseInt(situation.hoursPerWeek) || 0,
+                        monthly_income: parseInt(freedom.monthlyIncome) || 0,
+                        monthly_expenses: parseInt(freedom.monthlyExpenses) || 0,
+                        current_savings: parseInt(freedom.currentSavings) || 0,
+                        side_hustle_income: parseInt(freedom.sideHustleIncome) || 0,
+                        lado_name: ladoName || 'Atlas',
+                        onboarding_complete: true,
+                    }).eq('id', session.user.id);
+                }
+                window.location.href = 'platform.html';
+            }}
           />
         ) : step === 0 ? (
           <StepName name={name} setName={setName} onContinue={next} ladoName={ladoName} setLadoName={setLadoName} />
