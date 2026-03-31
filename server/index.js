@@ -12,6 +12,7 @@
  * Costa Spirits LLC — www.lado.club
  */
 
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -382,7 +383,7 @@ app.post('/api/missions', requireAuth, async (req, res) => {
         mission_id: mission.id,
         step_number: idx + 1,
         title: step.title,
-        owner: step.owner || 'user',
+        assigned_to: step.owner || 'user',
       }));
 
       await supabase.from('mission_steps').insert(stepsData);
@@ -450,7 +451,7 @@ app.post('/api/tasks', requireAuth, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('tasks')
-      .insert({ user_id: req.userId, title, description, mission_id, status: status || 'queued', due_date })
+      .insert({ user_id: req.userId, title, description, mission_id, status: status || 'queued' })
       .select()
       .single();
 
@@ -463,7 +464,7 @@ app.post('/api/tasks', requireAuth, async (req, res) => {
 
 app.put('/api/tasks/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
-  const allowed = ['title', 'description', 'status', 'due_date', 'mission_id'];
+  const allowed = ['title', 'description', 'status', 'mission_id'];
   const updates = {};
   for (const key of allowed) {
     if (req.body[key] !== undefined) updates[key] = req.body[key];
@@ -626,7 +627,7 @@ app.post('/api/hustles', requireAuth, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('hustles')
-      .insert({ user_id: req.userId, name, type, monthly_revenue: monthly_revenue || 0, status: status || 'active' })
+      .insert({ user_id: req.userId, name, category: type, revenue_this_month: monthly_revenue || 0, status: status || 'planning' })
       .select()
       .single();
 
@@ -669,7 +670,7 @@ app.post('/api/ledger', requireAuth, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('ledger_entries')
-      .insert({ user_id: req.userId, date: date || new Date().toISOString().split('T')[0], description, category, amount, type: type || (amount >= 0 ? 'income' : 'expense'), hustle_id })
+      .insert({ user_id: req.userId, date: date || new Date().toISOString().split('T')[0], description, category, amount, entry_type: type || (amount >= 0 ? 'income' : 'expense'), hustle_id })
       .select()
       .single();
 
@@ -809,13 +810,13 @@ app.get('/api/knowledge', requireAuth, async (req, res) => {
 });
 
 app.post('/api/knowledge', requireAuth, async (req, res) => {
-  const { title, content, type } = req.body;
-  if (!title || !content) return res.status(400).json({ error: 'Title and content are required' });
+  const { filename, file_url, file_type, summary } = req.body;
+  if (!filename || !file_url) return res.status(400).json({ error: 'Filename and file_url are required' });
 
   try {
     const { data, error } = await supabase
       .from('knowledge_base')
-      .insert({ user_id: req.userId, title, content, type: type || 'document' })
+      .insert({ user_id: req.userId, filename, file_url, file_type: file_type || 'document', summary })
       .select()
       .single();
 
@@ -852,12 +853,12 @@ app.post('/api/integrations', requireAuth, async (req, res) => {
       .from('integrations')
       .upsert({
         user_id: req.userId,
-        provider,
+        service: provider,
         access_token,
         refresh_token,
         config: intConfig || {},
         status: 'connected',
-      }, { onConflict: 'user_id, provider' })
+      }, { onConflict: 'user_id, service' })
       .select()
       .single();
 
@@ -970,7 +971,7 @@ app.get('/api/metrics', requireAuth, async (req, res) => {
       .from('user_metrics')
       .select('*')
       .eq('user_id', req.userId)
-      .order('recorded_at', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(30);
 
     if (error) return res.status(400).json({ error: error.message });
@@ -981,7 +982,7 @@ app.get('/api/metrics', requireAuth, async (req, res) => {
 });
 
 app.post('/api/metrics', requireAuth, async (req, res) => {
-  const { hustle_hours, energy_level, confidence_score } = req.body;
+  const { hustle_hours, confidence_score } = req.body;
 
   try {
     const { data, error } = await supabase
@@ -989,7 +990,6 @@ app.post('/api/metrics', requireAuth, async (req, res) => {
       .insert({
         user_id: req.userId,
         hustle_hours: hustle_hours || 0,
-        energy_level: energy_level || 5,
         confidence_score: confidence_score || 50,
       })
       .select()
