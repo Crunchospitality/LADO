@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # LADO API Server - Node.js application
+  lado-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lado-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      # Override Redis to use container network
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: production
+      TELEGRAM_BOT_NAME: LadoAgent
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+
+    networks:
+      - lado-network
+
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis 7 Cache & Job Queue (stays local — fast caching + rate limiting)
+  redis:
+    image: redis:7-alpine
+    container_name: lado-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass ""
+
+    volumes:
+      - redis_data:/data
+
+    networks:
+      - lado-network
+
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  lado-network:
+    driver: bridge

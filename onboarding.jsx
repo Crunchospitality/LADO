@@ -1,0 +1,1163 @@
+import React, { useState, useRef, useEffect } from "react";
+
+// ─── Design Tokens (LADO Brand Guide) ───
+const tokens = {
+  color: {
+    primary: "#20324D",
+    secondary: "#7BC8A4",
+    background: "#FAF7F2",
+    surface: "#F1EEE8",
+    text: "#20242B",
+    accent: "#D9A05B",
+    muted: "#667085",
+    border: "#E7E3DC",
+    success: "#5FAE84",
+    info: "#3E7CB1",
+    warning: "#C98A3D",
+    error: "#C85C5C",
+    white: "#FCFBF8",
+    deepSlate: "#344054",
+    ink: "#111827",
+  },
+  radius: { sm: 12, md: 16, lg: 20, xl: 24 },
+  shadow: {
+    card: "0 8px 24px rgba(32,36,43,0.06)",
+    modal: "0 18px 48px rgba(32,36,43,0.12)",
+    button: "0 2px 8px rgba(32,50,77,0.10)",
+    glow: "0 0 0 4px rgba(123,200,164,0.18)",
+  },
+};
+
+const fontStack = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+const headingFont = "'Sora', 'Inter', -apple-system, sans-serif";
+
+// ─── Inline SVG Icons ───
+const Icons = {
+  User: ({ size = 24, color = tokens.color.muted }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+  ),
+  Mail: ({ size = 24, color = tokens.color.muted }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/>
+    </svg>
+  ),
+  Upload: ({ size = 24, color = tokens.color.muted }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+  ),
+  Telegram: ({ size = 24, color = tokens.color.info }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.57 7.4c-.12.54-.44.67-.89.42l-2.44-1.8-1.18 1.14c-.13.13-.24.24-.5.24l.18-2.48 4.56-4.12c.2-.18-.04-.27-.3-.1l-5.64 3.55-2.43-.76c-.53-.16-.54-.53.11-.78l9.5-3.67c.44-.16.82.1.68.78z" fill={color}/>
+    </svg>
+  ),
+  Compass: ({ size = 24, color = tokens.color.accent }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+    </svg>
+  ),
+  Check: ({ size = 20, color = tokens.color.success }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6L9 17l-5-5"/>
+    </svg>
+  ),
+  Shield: ({ size = 20, color = tokens.color.secondary }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  ),
+  Lock: ({ size = 20, color = tokens.color.secondary }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+    </svg>
+  ),
+  FileText: ({ size = 20, color = tokens.color.muted }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+    </svg>
+  ),
+  X: ({ size = 20, color = tokens.color.muted }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  ),
+  ChevronRight: ({ size = 18, color = tokens.color.muted }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  ),
+  Search: ({ size = 20, color = tokens.color.accent }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+  ),
+  BarChart: ({ size = 20, color = tokens.color.info }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>
+    </svg>
+  ),
+  Pen: ({ size = 20, color = tokens.color.secondary }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    </svg>
+  ),
+  CheckCircle: ({ size = 20, color = tokens.color.success }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+  ),
+  Globe: ({ size = 20, color = tokens.color.info }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+    </svg>
+  ),
+  Layers: ({ size = 20, color = tokens.color.accent }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+    </svg>
+  ),
+  Zap: ({ size = 20, color = tokens.color.accent }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
+  ),
+  Inbox: ({ size = 20, color = tokens.color.muted }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/>
+    </svg>
+  ),
+  TrendingUp: ({ size = 20, color = tokens.color.success }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+    </svg>
+  ),
+  Calendar: ({ size = 20, color = tokens.color.muted }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+  ),
+  DollarSign: ({ size = 20, color = tokens.color.accent }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+    </svg>
+  ),
+  Users: ({ size = 20, color = tokens.color.info }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+    </svg>
+  ),
+  Gift: ({ size = 20, color = tokens.color.accent }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>
+    </svg>
+  ),
+  Clock: ({ size = 20, color = tokens.color.muted }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+    </svg>
+  ),
+  Rocket: ({ size = 20, color = tokens.color.primary }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+    </svg>
+  ),
+  Google: ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+  ),
+  Microsoft: ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
+      <rect x="13" y="1" width="10" height="10" fill="#7FBA00"/>
+      <rect x="1" y="13" width="10" height="10" fill="#00A4EF"/>
+      <rect x="13" y="13" width="10" height="10" fill="#FFB900"/>
+    </svg>
+  ),
+};
+
+// ─── Step Indicator ───
+function StepIndicator({ steps, currentStep }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 0, padding: "0 8px" }}>
+      {steps.map((step, i) => {
+        const done = i < currentStep;
+        const active = i === currentStep;
+        return (
+          <div key={i} style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: "50%",
+                background: done ? tokens.color.secondary : active ? tokens.color.primary : tokens.color.surface,
+                border: active ? `2px solid ${tokens.color.primary}` : done ? "none" : `2px solid ${tokens.color.border}`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.4s ease",
+                boxShadow: active ? tokens.shadow.glow : "none",
+              }}>
+                {done ? (
+                  <Icons.Check size={18} color="#fff" />
+                ) : (
+                  <span style={{
+                    fontFamily: fontStack, fontSize: 14, fontWeight: 600,
+                    color: active ? "#fff" : tokens.color.muted,
+                  }}>{i + 1}</span>
+                )}
+              </div>
+              <span style={{
+                fontFamily: fontStack, fontSize: 11, fontWeight: active ? 600 : 500,
+                color: active ? tokens.color.text : done ? tokens.color.secondary : tokens.color.muted,
+                whiteSpace: "nowrap",
+              }}>{step.label}</span>
+            </div>
+            {i < steps.length - 1 && (
+              <div style={{
+                width: 48, height: 2, margin: "0 6px", marginBottom: 22,
+                background: done ? tokens.color.secondary : tokens.color.border,
+                borderRadius: 1,
+                transition: "background 0.4s ease",
+              }} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Shared Button ───
+function Button({ children, onClick, variant = "primary", size = "md", icon, disabled, fullWidth, style: extra }) {
+  const styles = {
+    primary: { background: tokens.color.primary, color: "#fff", border: "none", boxShadow: tokens.shadow.button },
+    secondary: { background: tokens.color.surface, color: tokens.color.text, border: `1.5px solid ${tokens.color.border}`, boxShadow: "none" },
+    success: { background: tokens.color.secondary, color: "#fff", border: "none", boxShadow: tokens.shadow.button },
+    ghost: { background: "transparent", color: tokens.color.muted, border: "none", boxShadow: "none" },
+    accent: { background: tokens.color.accent, color: "#fff", border: "none", boxShadow: tokens.shadow.button },
+  };
+  const sizes = {
+    sm: { padding: "8px 16px", fontSize: 13 },
+    md: { padding: "12px 24px", fontSize: 15 },
+    lg: { padding: "14px 32px", fontSize: 16 },
+  };
+  return (
+    <button onClick={disabled ? undefined : onClick} disabled={disabled} style={{
+      ...styles[variant], ...sizes[size],
+      fontFamily: fontStack, fontWeight: 500, borderRadius: tokens.radius.sm,
+      cursor: disabled ? "not-allowed" : "pointer", display: "inline-flex", alignItems: "center", gap: 8,
+      opacity: disabled ? 0.5 : 1, transition: "all 0.2s ease",
+      width: fullWidth ? "100%" : "auto", justifyContent: "center",
+      ...extra,
+    }}>
+      {icon}{children}
+    </button>
+  );
+}
+
+// ─── Step Layout Wrapper ───
+function StepLayout({ icon, iconBg, title, subtitle, children, action, secondaryAction, skip }) {
+  return (
+    <div style={{
+      display: "flex", flexDirection: "column", alignItems: "center",
+      animation: "fadeSlideIn 0.45s ease",
+      width: "100%", maxWidth: 520, margin: "0 auto",
+    }}>
+      <div style={{
+        width: 72, height: 72, borderRadius: "50%", marginBottom: 24,
+        background: iconBg || `linear-gradient(135deg, ${tokens.color.primary}12, ${tokens.color.secondary}18)`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        {icon}
+      </div>
+      <h1 style={{
+        fontFamily: headingFont, fontSize: 30, fontWeight: 700,
+        color: tokens.color.text, margin: "0 0 8px", textAlign: "center",
+        letterSpacing: "-0.4px",
+      }}>{title}</h1>
+      <p style={{
+        fontFamily: fontStack, fontSize: 16, color: tokens.color.muted,
+        margin: "0 0 36px", textAlign: "center", lineHeight: 1.6,
+        maxWidth: 400,
+      }}>{subtitle}</p>
+
+      <div style={{ width: "100%", marginBottom: 32 }}>
+        {children}
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: "100%" }}>
+        {action}
+        {secondaryAction}
+        {skip && (
+          <button onClick={skip.onClick} style={{
+            background: "none", border: "none", cursor: "pointer",
+            fontFamily: fontStack, fontSize: 14, color: tokens.color.muted,
+            padding: "8px 16px", transition: "color 0.2s",
+          }}>
+            {skip.label || "Skip for now"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// ─── STEP 1: YOUR NAME ──────────────
+// ═══════════════════════════════════════
+function StepName({ name, setName, onContinue, ladoName, setLadoName }) {
+  const inputRef = useRef(null);
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  return (
+    <StepLayout
+      icon={<Icons.User size={32} color={tokens.color.primary} />}
+      title="Welcome to LADO"
+      subtitle="Your AI that works as hard as you do. First, what should your Lado call you?"
+      action={
+        <Button variant="primary" size="lg" fullWidth onClick={onContinue} disabled={!name.trim()}>
+          Continue
+        </Button>
+      }
+    >
+      <div>
+        <label style={{
+          fontFamily: fontStack, fontSize: 14, fontWeight: 500,
+          color: tokens.color.text, display: "block", marginBottom: 8,
+        }}>Your name</label>
+        <input
+          ref={inputRef}
+          value={name}
+          onChange={e => setName(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && name.trim() && onContinue()}
+          placeholder="e.g. Tommy"
+          style={{
+            width: "100%", padding: "14px 18px", fontFamily: fontStack, fontSize: 16,
+            border: `1.5px solid ${tokens.color.border}`, borderRadius: tokens.radius.sm,
+            background: tokens.color.white, outline: "none", boxSizing: "border-box",
+            transition: "border-color 0.2s, box-shadow 0.2s",
+          }}
+          onFocus={e => {
+            e.target.style.borderColor = tokens.color.primary;
+            e.target.style.boxShadow = `0 0 0 3px ${tokens.color.primary}12`;
+          }}
+          onBlur={e => {
+            e.target.style.borderColor = tokens.color.border;
+            e.target.style.boxShadow = "none";
+          }}
+        />
+      </div>
+    </StepLayout>
+  );
+}
+
+// ═══════════════════════════════════════
+// ─── STEP 2: YOUR SITUATION ──────────
+// ═══════════════════════════════════════
+
+const SKILL_OPTIONS = [
+  "Writing & Content", "Graphic Design", "Video Editing", "Web Development",
+  "Social Media", "Sales & Outreach", "Data Analysis", "Photography",
+  "Bookkeeping", "Virtual Assistant", "Teaching / Tutoring", "Marketing",
+  "Translation", "Customer Support", "Project Management", "Other",
+];
+
+function StepSituation({ situation, setSituation, onContinue }) {
+  const update = (field, value) => setSituation(prev => ({ ...prev, [field]: value }));
+  const canContinue = situation.currentJob && situation.skills.length > 0 && situation.hoursPerWeek;
+
+  return (
+    <StepLayout
+      icon={<Icons.Compass size={32} color={tokens.color.accent} />}
+      iconBg={`linear-gradient(135deg, ${tokens.color.accent}18, ${tokens.color.warning}10)`}
+      title="Tell us about your situation"
+      subtitle="This helps your Lado find the perfect side hustle for your skills and schedule."
+      action={
+        <Button variant="primary" size="lg" fullWidth onClick={onContinue} disabled={!canContinue}>
+          Continue
+        </Button>
+      }
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        {/* Current job */}
+        <div>
+          <label style={{
+            fontFamily: fontStack, fontSize: 14, fontWeight: 500,
+            color: tokens.color.text, display: "block", marginBottom: 8,
+          }}>What's your current job?</label>
+          <input
+            value={situation.currentJob}
+            onChange={e => update("currentJob", e.target.value)}
+            placeholder="e.g. Marketing Manager, Nurse, Teacher, Retail..."
+            style={{
+              width: "100%", padding: "14px 18px", fontFamily: fontStack, fontSize: 15,
+              border: `1.5px solid ${tokens.color.border}`, borderRadius: tokens.radius.sm,
+              background: tokens.color.white, outline: "none", boxSizing: "border-box",
+              transition: "border-color 0.2s",
+            }}
+            onFocus={e => e.target.style.borderColor = tokens.color.primary}
+            onBlur={e => e.target.style.borderColor = tokens.color.border}
+          />
+        </div>
+
+        {/* Skills */}
+        <div>
+          <label style={{
+            fontFamily: fontStack, fontSize: 14, fontWeight: 500,
+            color: tokens.color.text, display: "block", marginBottom: 8,
+          }}>What skills do you have? <span style={{ color: tokens.color.muted, fontWeight: 400 }}>(pick all that apply)</span></label>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {SKILL_OPTIONS.map(skill => {
+              const selected = situation.skills.includes(skill);
+              return (
+                <button
+                  key={skill}
+                  onClick={() => {
+                    if (selected) {
+                      update("skills", situation.skills.filter(s => s !== skill));
+                    } else {
+                      update("skills", [...situation.skills, skill]);
+                    }
+                  }}
+                  style={{
+                    padding: "8px 16px", borderRadius: 20, cursor: "pointer",
+                    fontFamily: fontStack, fontSize: 13, fontWeight: 500,
+                    background: selected ? `${tokens.color.primary}12` : tokens.color.white,
+                    color: selected ? tokens.color.primary : tokens.color.text,
+                    border: `1.5px solid ${selected ? tokens.color.primary + "44" : tokens.color.border}`,
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  {skill}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Hours per week */}
+        <div>
+          <label style={{
+            fontFamily: fontStack, fontSize: 14, fontWeight: 500,
+            color: tokens.color.text, display: "block", marginBottom: 8,
+          }}>How many spare hours per week do you have?</label>
+          <div style={{ display: "flex", gap: 8 }}>
+            {["5-10 hrs", "10-20 hrs", "20-30 hrs", "30+ hrs"].map(opt => {
+              const selected = situation.hoursPerWeek === opt;
+              return (
+                <button
+                  key={opt}
+                  onClick={() => update("hoursPerWeek", opt)}
+                  style={{
+                    flex: 1, padding: "12px 8px", borderRadius: tokens.radius.sm,
+                    cursor: "pointer", fontFamily: fontStack, fontSize: 14, fontWeight: 500,
+                    background: selected ? tokens.color.primary : tokens.color.white,
+                    color: selected ? "#fff" : tokens.color.text,
+                    border: `1.5px solid ${selected ? tokens.color.primary : tokens.color.border}`,
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </StepLayout>
+  );
+}
+
+
+// ═══════════════════════════════════════
+// ─── STEP 3: YOUR BUDGET ─────────────
+// ═══════════════════════════════════════
+
+const BUDGET_OPTIONS = [
+  { value: "$0 – $100", label: "$0 – $100", desc: "Lean start — free tools, sweat equity", icon: <Icons.Zap size={20} color={tokens.color.success} /> },
+  { value: "$100 – $500", label: "$100 – $500", desc: "Some room — basic tools & small ad tests", icon: <Icons.TrendingUp size={20} color={tokens.color.info} /> },
+  { value: "$500 – $1,000", label: "$500 – $1K", desc: "Comfortable — proper tooling, inventory", icon: <Icons.BarChart size={20} color={tokens.color.accent} /> },
+  { value: "$1,000+", label: "$1,000+", desc: "All in — ready to invest in growth", icon: <Icons.DollarSign size={20} color={tokens.color.warning} /> },
+];
+
+function StepBudget({ budget, setBudget, onContinue }) {
+  return (
+    <StepLayout
+      icon={<Icons.DollarSign size={32} color={tokens.color.accent} />}
+      iconBg={`linear-gradient(135deg, ${tokens.color.accent}18, ${tokens.color.success}10)`}
+      title="What's your startup budget?"
+      subtitle="Be honest — Lado finds opportunities that match YOUR budget, not someone else's."
+      action={
+        <Button variant="primary" size="lg" fullWidth onClick={onContinue} disabled={!budget}>
+          Continue
+        </Button>
+      }
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {BUDGET_OPTIONS.map(opt => {
+          const selected = budget === opt.value;
+          return (
+            <button
+              key={opt.value}
+              onClick={() => setBudget(opt.value)}
+              style={{
+                display: "flex", alignItems: "center", gap: 14,
+                width: "100%", padding: "16px 18px",
+                background: selected ? `${tokens.color.primary}08` : tokens.color.white,
+                border: `1.5px solid ${selected ? tokens.color.primary + "44" : tokens.color.border}`,
+                borderRadius: tokens.radius.md,
+                cursor: "pointer", transition: "all 0.2s ease",
+                textAlign: "left", fontFamily: fontStack,
+              }}
+            >
+              <div style={{
+                width: 44, height: 44, borderRadius: tokens.radius.sm, flexShrink: 0,
+                background: tokens.color.surface,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {opt.icon}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: tokens.color.text }}>{opt.label}</div>
+                <div style={{ fontSize: 13, color: tokens.color.muted, marginTop: 2 }}>{opt.desc}</div>
+              </div>
+              <div style={{
+                width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
+                background: selected ? tokens.color.primary : "transparent",
+                border: selected ? "none" : `2px solid ${tokens.color.border}`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.2s ease",
+              }}>
+                {selected && <Icons.Check size={14} color="#fff" />}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </StepLayout>
+  );
+}
+
+
+// ═══════════════════════════════════════
+// ─── STEP 4: FREEDOM NUMBER ──────────
+// ═══════════════════════════════════════
+
+function StepFreedom({ freedom, setFreedom, onContinue }) {
+  const update = (field, value) => setFreedom(prev => ({ ...prev, [field]: value }));
+  const monthlyIncome = parseInt(freedom.monthlyIncome) || 0;
+  const monthlyExpenses = parseInt(freedom.monthlyExpenses) || 0;
+  const currentSavings = parseInt(freedom.currentSavings) || 0;
+  const sideHustleIncome = parseInt(freedom.sideHustleIncome) || 0;
+
+  const canContinue = monthlyIncome > 0 && monthlyExpenses > 0;
+
+  // Freedom metrics
+  const runwayNeeded = monthlyExpenses * 6; // 6 months emergency fund
+  const salaryTarget = Math.round(monthlyIncome * 0.75); // 75% salary replacement
+  const savingsPct = runwayNeeded > 0 ? Math.min(Math.round((currentSavings / runwayNeeded) * 100), 100) : 0;
+  const incomePct = salaryTarget > 0 ? Math.min(Math.round((sideHustleIncome / salaryTarget) * 100), 100) : 0;
+  const readiness = Math.round((savingsPct + incomePct) / 2);
+
+  const readinessColor = readiness >= 75 ? tokens.color.success : readiness >= 40 ? tokens.color.accent : tokens.color.error || "#E74C3C";
+  const readinessLabel = readiness >= 75 ? "Almost there!" : readiness >= 40 ? "Building momentum" : "Just getting started";
+
+  const inputStyle = {
+    width: "100%", padding: "14px 18px 14px 32px", fontFamily: fontStack, fontSize: 16,
+    border: `1.5px solid ${tokens.color.border}`, borderRadius: tokens.radius.sm,
+    background: tokens.color.white, outline: "none", boxSizing: "border-box",
+    transition: "border-color 0.2s",
+  };
+  const labelStyle = {
+    fontFamily: fontStack, fontSize: 14, fontWeight: 500,
+    color: tokens.color.text, display: "block", marginBottom: 8,
+  };
+  const dollarStyle = {
+    position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)",
+    fontFamily: fontStack, fontSize: 16, color: tokens.color.muted,
+  };
+  const focusHandler = e => e.target.style.borderColor = tokens.color.primary;
+  const blurHandler = e => e.target.style.borderColor = tokens.color.border;
+
+  return (
+    <StepLayout
+      icon={<Icons.TrendingUp size={32} color={tokens.color.success} />}
+      iconBg={`linear-gradient(135deg, ${tokens.color.success}18, ${tokens.color.secondary}10)`}
+      title="Calculate your Freedom Number"
+      subtitle="Based on what financial experts recommend: 6 months of savings + side hustle covering 75% of your salary."
+      action={
+        <Button variant="primary" size="lg" fullWidth onClick={onContinue} disabled={!canContinue}>
+          Continue
+        </Button>
+      }
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {/* Row 1: Salary + Expenses */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div>
+            <label style={labelStyle}>Monthly take-home pay</label>
+            <div style={{ position: "relative" }}>
+              <span style={dollarStyle}>$</span>
+              <input type="number" value={freedom.monthlyIncome} onChange={e => update("monthlyIncome", e.target.value)}
+                placeholder="4,200" style={inputStyle} onFocus={focusHandler} onBlur={blurHandler} />
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>Monthly expenses</label>
+            <div style={{ position: "relative" }}>
+              <span style={dollarStyle}>$</span>
+              <input type="number" value={freedom.monthlyExpenses} onChange={e => update("monthlyExpenses", e.target.value)}
+                placeholder="3,200" style={inputStyle} onFocus={focusHandler} onBlur={blurHandler} />
+            </div>
+          </div>
+        </div>
+
+        {/* Row 2: Savings + Side hustle income */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div>
+            <label style={labelStyle}>Current savings</label>
+            <div style={{ position: "relative" }}>
+              <span style={dollarStyle}>$</span>
+              <input type="number" value={freedom.currentSavings} onChange={e => update("currentSavings", e.target.value)}
+                placeholder="8,000" style={inputStyle} onFocus={focusHandler} onBlur={blurHandler} />
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>Side hustle income <span style={{ fontWeight: 400, color: tokens.color.muted }}>/mo</span></label>
+            <div style={{ position: "relative" }}>
+              <span style={dollarStyle}>$</span>
+              <input type="number" value={freedom.sideHustleIncome} onChange={e => update("sideHustleIncome", e.target.value)}
+                placeholder="0" style={inputStyle} onFocus={focusHandler} onBlur={blurHandler} />
+            </div>
+          </div>
+        </div>
+
+        {/* Freedom Number display */}
+        {canContinue && (
+          <div style={{
+            background: `linear-gradient(135deg, ${tokens.color.primary}, ${tokens.color.primary}dd)`,
+            borderRadius: tokens.radius.lg, padding: "24px 28px",
+            position: "relative", overflow: "hidden",
+          }}>
+            <div style={{
+              position: "absolute", top: -30, right: -30, width: 100, height: 100,
+              borderRadius: "50%", background: "rgba(255,255,255,0.04)",
+            }} />
+            <div style={{ position: "relative", zIndex: 1 }}>
+              {/* Freedom Number */}
+              <div style={{
+                fontFamily: fontStack, fontSize: 13, fontWeight: 500,
+                color: "rgba(255,255,255,0.6)", marginBottom: 6,
+                textTransform: "uppercase", letterSpacing: 1.5,
+              }}>Your Freedom Number</div>
+              <div style={{
+                fontFamily: headingFont, fontSize: 42, fontWeight: 700,
+                color: "#fff", letterSpacing: "-1px",
+              }}>${monthlyExpenses.toLocaleString()}<span style={{ fontSize: 18, fontWeight: 400, color: "rgba(255,255,255,0.6)" }}>/mo</span></div>
+
+              {/* Two benchmarks */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 16 }}>
+                {/* Savings runway */}
+                <div>
+                  <div style={{ fontFamily: fontStack, fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>
+                    6-Month Runway
+                  </div>
+                  <div style={{ fontFamily: headingFont, fontSize: 20, fontWeight: 700, color: "#fff" }}>
+                    ${runwayNeeded.toLocaleString()}
+                  </div>
+                  <div style={{
+                    height: 4, borderRadius: 2, background: "rgba(255,255,255,0.15)", marginTop: 6, overflow: "hidden",
+                  }}>
+                    <div style={{
+                      height: "100%", borderRadius: 2, width: `${savingsPct}%`,
+                      background: savingsPct >= 100 ? tokens.color.success : "rgba(255,255,255,0.7)",
+                      transition: "width 0.5s ease",
+                    }} />
+                  </div>
+                  <div style={{ fontFamily: fontStack, fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 4 }}>
+                    {currentSavings > 0 ? `$${currentSavings.toLocaleString()} saved (${savingsPct}%)` : "Enter savings above"}
+                  </div>
+                </div>
+
+                {/* Income replacement */}
+                <div>
+                  <div style={{ fontFamily: fontStack, fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>
+                    75% Salary Target
+                  </div>
+                  <div style={{ fontFamily: headingFont, fontSize: 20, fontWeight: 700, color: "#fff" }}>
+                    ${salaryTarget.toLocaleString()}/mo
+                  </div>
+                  <div style={{
+                    height: 4, borderRadius: 2, background: "rgba(255,255,255,0.15)", marginTop: 6, overflow: "hidden",
+                  }}>
+                    <div style={{
+                      height: "100%", borderRadius: 2, width: `${incomePct}%`,
+                      background: incomePct >= 100 ? tokens.color.success : "rgba(255,255,255,0.7)",
+                      transition: "width 0.5s ease",
+                    }} />
+                  </div>
+                  <div style={{ fontFamily: fontStack, fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 4 }}>
+                    {sideHustleIncome > 0 ? `$${sideHustleIncome.toLocaleString()}/mo hustle (${incomePct}%)` : "Enter hustle income above"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Readiness score */}
+              {(currentSavings > 0 || sideHustleIncome > 0) && (
+                <div style={{
+                  marginTop: 16, padding: "12px 16px", borderRadius: tokens.radius.sm,
+                  background: "rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between",
+                }}>
+                  <div>
+                    <div style={{ fontFamily: fontStack, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Quit-Ready Score</div>
+                    <div style={{ fontFamily: fontStack, fontSize: 14, fontWeight: 600, color: readinessColor, marginTop: 2 }}>{readinessLabel}</div>
+                  </div>
+                  <div style={{ fontFamily: headingFont, fontSize: 28, fontWeight: 700, color: readinessColor }}>{readiness}%</div>
+                </div>
+              )}
+
+              <div style={{
+                fontFamily: fontStack, fontSize: 13, color: "rgba(255,255,255,0.6)",
+                marginTop: 12, lineHeight: 1.5,
+              }}>
+                Experts say: save 6 months of expenses + side hustle earning 75% of your salary for 3 straight months. Your Lado tracks every dollar.
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </StepLayout>
+  );
+}
+
+
+// ═══════════════════════════════════════
+// ─── STEP 5: YOUR LADO ──────────────
+// ═══════════════════════════════════════
+
+const LADO_ENGINES = [
+  { icon: <Icons.Search size={20} color={tokens.color.accent} />, name: "Discover", desc: "Finds the perfect side hustle for your skills, scrapes the latest strategies from top creators, and keeps you ahead of trends." },
+  { icon: <Icons.Layers size={20} color={tokens.color.info} />, name: "Build", desc: "Creates profiles, drafts outreach, generates content, manages clients, and optimizes your schedule around your 9-to-5." },
+  { icon: <Icons.DollarSign size={20} color={tokens.color.accent} />, name: "Formalize", desc: "Auto-generates P&L statements, revenue projections, business plans, branding guides, and loan application packages." },
+  { icon: <Icons.Shield size={20} color={tokens.color.success} />, name: "Protect", desc: "Tracks your Freedom Number (6-month runway + 75% salary replacement), monitors burnout, manages finances, and tells you when you're ready to quit." },
+];
+
+const CONNECT_CHANNELS = [
+  { id: "telegram", name: "Telegram", desc: "Text your Lado on the go", icon: <Icons.Telegram size={20} color={tokens.color.info} /> },
+  { id: "discord", name: "Discord", desc: "Community + agent access", icon: <Icons.Globe size={20} color={tokens.color.info} /> },
+];
+
+function StepYourLado({ name, ladoName, setLadoName, onGetStarted }) {
+  const [channels, setChannels] = useState([]);
+
+  const toggleChannel = (id) => {
+    setChannels(prev => prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]);
+  };
+
+  return (
+    <div style={{
+      display: "flex", flexDirection: "column", alignItems: "center",
+      animation: "fadeSlideIn 0.45s ease",
+      width: "100%", maxWidth: 680, margin: "0 auto",
+    }}>
+      <div style={{
+        width: 72, height: 72, borderRadius: "50%", marginBottom: 24,
+        background: `linear-gradient(135deg, ${tokens.color.primary}14, ${tokens.color.accent}18)`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <Icons.Rocket size={32} color={tokens.color.primary} />
+      </div>
+
+      <h1 style={{
+        fontFamily: headingFont, fontSize: 30, fontWeight: 700,
+        color: tokens.color.text, margin: "0 0 8px", textAlign: "center",
+        letterSpacing: "-0.4px",
+      }}>Meet your Lado</h1>
+      <p style={{
+        fontFamily: fontStack, fontSize: 16, color: tokens.color.muted,
+        margin: "0 0 32px", textAlign: "center", lineHeight: 1.6, maxWidth: 460,
+      }}>
+        Your AI is ready to start working for you. Here's what it can do — all four engines, working together toward your freedom.
+      </p>
+
+      {/* Four engines grid */}
+      <div style={{
+        display: "grid", gridTemplateColumns: "1fr 1fr",
+        gap: 10, width: "100%", marginBottom: 28,
+      }}>
+        {LADO_ENGINES.map((eng, i) => (
+          <div key={i} style={{
+            display: "flex", alignItems: "flex-start", gap: 12,
+            padding: "14px 16px",
+            background: tokens.color.white,
+            border: `1px solid ${tokens.color.border}`,
+            borderRadius: tokens.radius.md,
+          }}>
+            <div style={{
+              width: 38, height: 38, borderRadius: tokens.radius.sm, flexShrink: 0,
+              background: tokens.color.surface,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              {eng.icon}
+            </div>
+            <div>
+              <div style={{
+                fontFamily: fontStack, fontSize: 14, fontWeight: 600,
+                color: tokens.color.text, marginBottom: 2,
+              }}>{eng.name}</div>
+              <div style={{
+                fontFamily: fontStack, fontSize: 12, color: tokens.color.muted,
+                lineHeight: 1.45,
+              }}>{eng.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Name your Lado */}
+      <div style={{ width: "100%", marginBottom: 20 }}>
+        <label style={{
+          fontFamily: fontStack, fontSize: 14, fontWeight: 500,
+          color: tokens.color.text, display: "block", marginBottom: 8,
+        }}>Give your Lado a name <span style={{ fontWeight: 400, color: tokens.color.muted }}>(optional)</span></label>
+        <input
+          value={ladoName}
+          onChange={e => setLadoName(e.target.value)}
+          placeholder="e.g. Lado, Max, Luna, Atlas..."
+          style={{
+            width: "100%", padding: "14px 18px", fontFamily: fontStack, fontSize: 15,
+            border: `1.5px solid ${tokens.color.border}`, borderRadius: tokens.radius.sm,
+            background: tokens.color.white, outline: "none", boxSizing: "border-box",
+            transition: "border-color 0.2s",
+          }}
+          onFocus={e => e.target.style.borderColor = tokens.color.primary}
+          onBlur={e => e.target.style.borderColor = tokens.color.border}
+        />
+      </div>
+
+      {/* Connect channels */}
+      <div style={{ width: "100%", marginBottom: 28 }}>
+        <label style={{
+          fontFamily: fontStack, fontSize: 14, fontWeight: 500,
+          color: tokens.color.text, display: "block", marginBottom: 8,
+        }}>How do you want to talk to your Lado?</label>
+        <div style={{ display: "flex", gap: 10 }}>
+          {CONNECT_CHANNELS.map(ch => {
+            const selected = channels.includes(ch.id);
+            return (
+              <button
+                key={ch.id}
+                onClick={() => toggleChannel(ch.id)}
+                style={{
+                  flex: 1, display: "flex", alignItems: "center", gap: 12,
+                  padding: "14px 16px", borderRadius: tokens.radius.md,
+                  cursor: "pointer", fontFamily: fontStack, textAlign: "left",
+                  background: selected ? `${tokens.color.primary}08` : tokens.color.white,
+                  border: `1.5px solid ${selected ? tokens.color.primary + "44" : tokens.color.border}`,
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <div style={{
+                  width: 38, height: 38, borderRadius: tokens.radius.sm, flexShrink: 0,
+                  background: tokens.color.surface,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>{ch.icon}</div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: tokens.color.text }}>{ch.name}</div>
+                  <div style={{ fontSize: 12, color: tokens.color.muted }}>{ch.desc}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Trial card */}
+      <div style={{
+        width: "100%",
+        background: `linear-gradient(135deg, ${tokens.color.primary}, ${tokens.color.primary}dd)`,
+        borderRadius: tokens.radius.xl,
+        padding: "28px 32px",
+        marginBottom: 28,
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute", top: -40, right: -40, width: 140, height: 140,
+          borderRadius: "50%", background: "rgba(255,255,255,0.04)",
+        }} />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <Icons.Gift size={22} color={tokens.color.accent} />
+            <span style={{
+              fontFamily: headingFont, fontSize: 20, fontWeight: 700,
+              color: "#fff", letterSpacing: "-0.3px",
+            }}>Start your freedom journey</span>
+          </div>
+          <p style={{
+            fontFamily: fontStack, fontSize: 15, color: "rgba(255,255,255,0.8)",
+            lineHeight: 1.65, margin: "0 0 16px", maxWidth: 520,
+          }}>
+            Your Lado will analyze your skills, find the right side hustle, optimize your schedule, and track your progress toward freedom. $29/month — cancel anytime.
+          </p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            {[
+              { icon: <Icons.Search size={14} color={tokens.color.accent} />, text: "Side hustle matching" },
+              { icon: <Icons.Calendar size={14} color={tokens.color.accent} />, text: "Schedule optimization" },
+              { icon: <Icons.TrendingUp size={14} color={tokens.color.accent} />, text: "Freedom Number tracking" },
+              { icon: <Icons.Shield size={14} color={tokens.color.accent} />, text: "Wellness check-ins" },
+            ].map((item, i) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "5px 12px", background: "rgba(255,255,255,0.08)",
+                borderRadius: 20,
+              }}>
+                {item.icon}
+                <span style={{
+                  fontFamily: fontStack, fontSize: 12, fontWeight: 500,
+                  color: "rgba(255,255,255,0.9)",
+                }}>{item.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <Button
+        variant="success" size="lg" fullWidth
+        onClick={onGetStarted}
+        style={{ maxWidth: 400, fontSize: 17, padding: "16px 32px" }}
+      >
+        Activate my Lado
+      </Button>
+
+      <p style={{
+        fontFamily: fontStack, fontSize: 12, color: tokens.color.muted,
+        margin: "12px 0 0", textAlign: "center",
+      }}>
+        7-day free trial — no credit card required to start.
+      </p>
+    </div>
+  );
+}
+
+
+// ═══════════════════════════════════════
+// ─── SUCCESS SCREEN ─────────────────
+// ═══════════════════════════════════════
+function SuccessScreen({ name, ladoName, freedomNumber, readinessScore, runwaySavings, salaryTarget, onGo }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => { setTimeout(() => setShow(true), 100); }, []);
+
+  const displayName = ladoName || "Lado";
+
+  return (
+    <div style={{
+      display: "flex", flexDirection: "column", alignItems: "center",
+      justifyContent: "center", textAlign: "center",
+      opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(20px)",
+      transition: "all 0.6s ease",
+    }}>
+      <div style={{
+        width: 88, height: 88, borderRadius: "50%", marginBottom: 28,
+        background: `linear-gradient(135deg, ${tokens.color.secondary}22, ${tokens.color.success}18)`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <Icons.Check size={44} color={tokens.color.success} />
+      </div>
+
+      <h1 style={{
+        fontFamily: headingFont, fontSize: 34, fontWeight: 700,
+        color: tokens.color.text, margin: "0 0 10px",
+        letterSpacing: "-0.5px",
+      }}>You're all set, {name}!</h1>
+      <p style={{
+        fontFamily: fontStack, fontSize: 16, color: tokens.color.muted,
+        margin: "0 0 28px", maxWidth: 400, lineHeight: 1.6,
+      }}>
+        {displayName} is ready to start finding your path to freedom. All four engines are online and working for you.
+      </p>
+
+      {/* Freedom Number reminder */}
+      {freedomNumber > 0 && (
+        <div style={{
+          background: tokens.color.surface, borderRadius: tokens.radius.lg,
+          padding: "20px 28px", marginBottom: 28, width: "100%", maxWidth: 420,
+        }}>
+          <div style={{
+            fontFamily: fontStack, fontSize: 12, fontWeight: 500,
+            color: tokens.color.muted, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 6,
+          }}>Your Freedom Number</div>
+          <div style={{
+            fontFamily: headingFont, fontSize: 36, fontWeight: 700,
+            color: tokens.color.primary,
+          }}>${freedomNumber.toLocaleString()}<span style={{ fontSize: 16, fontWeight: 400, color: tokens.color.muted }}>/mo</span></div>
+          <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
+            <div style={{ flex: 1, padding: "10px 12px", background: tokens.color.white, borderRadius: tokens.radius.sm, border: `1px solid ${tokens.color.border}` }}>
+              <div style={{ fontFamily: fontStack, fontSize: 11, color: tokens.color.muted }}>6-Mo Runway</div>
+              <div style={{ fontFamily: headingFont, fontSize: 18, fontWeight: 700, color: tokens.color.text }}>${(runwaySavings || 0).toLocaleString()}</div>
+            </div>
+            <div style={{ flex: 1, padding: "10px 12px", background: tokens.color.white, borderRadius: tokens.radius.sm, border: `1px solid ${tokens.color.border}` }}>
+              <div style={{ fontFamily: fontStack, fontSize: 11, color: tokens.color.muted }}>75% Salary Target</div>
+              <div style={{ fontFamily: headingFont, fontSize: 18, fontWeight: 700, color: tokens.color.text }}>${(salaryTarget || 0).toLocaleString()}/mo</div>
+            </div>
+            {readinessScore > 0 && (
+              <div style={{ flex: 1, padding: "10px 12px", background: tokens.color.white, borderRadius: tokens.radius.sm, border: `1px solid ${tokens.color.border}` }}>
+                <div style={{ fontFamily: fontStack, fontSize: 11, color: tokens.color.muted }}>Quit-Ready</div>
+                <div style={{ fontFamily: headingFont, fontSize: 18, fontWeight: 700, color: readinessScore >= 75 ? tokens.color.success : readinessScore >= 40 ? tokens.color.accent : tokens.color.error || "#E74C3C" }}>{readinessScore}%</div>
+              </div>
+            )}
+          </div>
+          <div style={{
+            fontFamily: fontStack, fontSize: 13, color: tokens.color.muted,
+            marginTop: 10,
+          }}>
+            {displayName} will track every dollar toward freedom.
+          </div>
+        </div>
+      )}
+
+      {/* Engine status pills */}
+      <div style={{
+        display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center",
+        marginBottom: 32, maxWidth: 420,
+      }}>
+        {["Discover", "Build", "Formalize", "Protect"].map(engine => (
+          <span key={engine} style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            padding: "6px 14px", borderRadius: 20,
+            background: `${tokens.color.success}10`, border: `1px solid ${tokens.color.success}22`,
+            fontFamily: fontStack, fontSize: 13, fontWeight: 500, color: tokens.color.success,
+          }}>
+            <Icons.Check size={12} color={tokens.color.success} />
+            {engine}
+          </span>
+        ))}
+      </div>
+
+      <Button variant="success" size="lg" onClick={onGo} style={{ minWidth: 260 }}>
+        Start my freedom journey
+      </Button>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════
+// ─── MAIN ONBOARDING APP ────────────
+// ═══════════════════════════════════════
+
+const STEPS = [
+  { label: "You" },
+  { label: "Situation" },
+  { label: "Budget" },
+  { label: "Freedom" },
+  { label: "Your Lado" },
+];
+
+export default function OnboardingWizard() {
+  const [step, setStep] = useState(0);
+  const [name, setName] = useState("");
+  const [ladoName, setLadoName] = useState("");
+  const [situation, setSituation] = useState({ currentJob: "", skills: [], hoursPerWeek: "" });
+  const [budget, setBudget] = useState("");
+  const [freedom, setFreedom] = useState({ monthlyIncome: "", monthlyExpenses: "", currentSavings: "", sideHustleIncome: "" });
+  const [done, setDone] = useState(false);
+
+  const next = () => setStep(s => Math.min(s + 1, STEPS.length - 1));
+  const monthlyExpenses = parseInt(freedom.monthlyExpenses) || 0;
+  const monthlySalary = parseInt(freedom.monthlyIncome) || 0;
+  const currentSavings = parseInt(freedom.currentSavings) || 0;
+  const sideHustleIncome = parseInt(freedom.sideHustleIncome) || 0;
+  const freedomNumber = monthlyExpenses; // monthly target your side hustle must cover
+  const runwaySavings = monthlyExpenses * 6; // 6 months emergency fund
+  const salaryTarget = Math.round(monthlySalary * 0.75); // 75% salary replacement
+  const savingsProgress = runwaySavings > 0 ? Math.min(Math.round((currentSavings / runwaySavings) * 100), 100) : 0;
+  const incomeProgress = salaryTarget > 0 ? Math.min(Math.round((sideHustleIncome / salaryTarget) * 100), 100) : 0;
+  const readinessScore = Math.round((savingsProgress + incomeProgress) / 2);
+
+  return (
+    <div style={{
+      fontFamily: fontStack,
+      background: tokens.color.background,
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: ${tokens.color.border}; border-radius: 3px; }
+        ::selection { background: ${tokens.color.secondary}33; }
+        input::placeholder { color: ${tokens.color.muted}88; }
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+      `}</style>
+
+      {/* Header */}
+      <div style={{
+        padding: "20px 32px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        borderBottom: `1px solid ${tokens.color.border}`,
+        background: tokens.color.white,
+      }}>
+        <div style={{
+          fontFamily: headingFont, fontSize: 20, fontWeight: 700,
+          color: tokens.color.primary, letterSpacing: "-0.3px",
+        }}>LADO</div>
+        {!done && <StepIndicator steps={STEPS} currentStep={step} />}
+        <div style={{ width: 100 }} />
+      </div>
+
+      {/* Content */}
+      <div style={{
+        flex: 1, display: "flex", alignItems: step === 4 ? "flex-start" : "center", justifyContent: "center",
+        padding: step === 4 ? "32px 24px" : "40px 24px",
+        overflowY: "auto",
+      }}>
+        {done ? (
+          <SuccessScreen
+            name={name}
+            ladoName={ladoName}
+            freedomNumber={freedomNumber}
+            readinessScore={readinessScore}
+            runwaySavings={runwaySavings}
+            salaryTarget={salaryTarget}
+            onGo={() => alert("Launching your Lado! (This would navigate to the main dashboard)")}
+          />
+        ) : step === 0 ? (
+          <StepName name={name} setName={setName} onContinue={next} ladoName={ladoName} setLadoName={setLadoName} />
+        ) : step === 1 ? (
+          <StepSituation situation={situation} setSituation={setSituation} onContinue={next} />
+        ) : step === 2 ? (
+          <StepBudget budget={budget} setBudget={setBudget} onContinue={next} />
+        ) : step === 3 ? (
+          <StepFreedom freedom={freedom} setFreedom={setFreedom} onContinue={next} />
+        ) : step === 4 ? (
+          <StepYourLado name={name} ladoName={ladoName} setLadoName={setLadoName} onGetStarted={() => setDone(true)} />
+        ) : null}
+      </div>
+
+      {/* Footer */}
+      <div style={{
+        padding: "16px 32px",
+        borderTop: `1px solid ${tokens.color.border}`,
+        background: tokens.color.white,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <span style={{
+          fontFamily: fontStack, fontSize: 12, color: tokens.color.muted,
+        }}>
+          LADO by Costa Spirits LLC — Your data is encrypted and never shared.
+        </span>
+      </div>
+    </div>
+  );
+}

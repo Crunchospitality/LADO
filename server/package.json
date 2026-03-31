@@ -1,0 +1,36 @@
+{
+  "name": "lado-server",
+  "version": "0.1.0",
+  "description": "LADO AI Agent Platform - Server",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "telegram": "node telegram-bot.js",
+    "migrate": "node -e \"const fs=require('fs');const {Client}=require('pg');const c=new Client({connectionString:process.env.DATABASE_URL||'postgresql://lado:lado@localhost:5432/lado'});c.connect().then(()=>c.query(fs.readFileSync('./schema.sql','utf8'))).then(()=>{console.log('Migration complete');c.end()}).catch(e=>{console.error(e);c.end();process.exit(1)})\"",
+    "health": "curl -s http://localhost:3000/health | node -e \"process.stdin.on('data',d=>console.log(JSON.parse(d)))\""
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@supabase/supabase-js": "^2.49.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "helmet": "^8.0.0",
+    "ioredis": "^5.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "node-telegram-bot-api": "^0.66.0",
+    "pg": "^8.13.0",
+    "stripe": "^17.5.0",
+    "uuid": "^11.0.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": "Costa Spirits LLC <tommy@costaspirits.com>",
+  "license": "UNLICENSED"
+}

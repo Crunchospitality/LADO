@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LADO — Your AI-Powered Escape Plan</title>
+    <meta name="description" content="LADO helps you escape your 9-to-5 through AI-powered side hustle intelligence, execution, and financial formalization.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #FAF7F2;
+            color: #20242B;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        h3 {
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+        }
+
+        p {
+            font-size: 1rem;
+            color: #20242B;
+        }
+
+        a {
+            color: #7BC8A4;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #20324D;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.875rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: #20324D;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #7BC8A4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(123, 200, 164, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #20324D;
+            border: 2px solid #20324D;
+        }
+
+        .btn-secondary:hover {
+            background-color: #20324D;
+            color: white;
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            color: #20324D;
+            border: 2px solid #D9A05B;
+        }
+
+        .btn-ghost:hover {
+            background-color: #D9A05B;
+            color: white;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header */
+        header {
+            background-color: #FAF7F2;
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(32, 50, 77, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #20324D;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #7BC8A4;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #20242B;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #7BC8A4;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #FAF7F2 0%, #F1EEE8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(123, 200, 164, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #F1EEE8;
+            color: #20324D;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(123, 200, 164, 0.3);
+        }
+
+        .badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .hero h1 {
+            margin-bottom: 1.5rem;
+            color: #20324D;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            color: #20242B;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero-buttons .btn {
+            padding: 1rem 2.5rem;
+        }
+
+        .hero-trust {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(32, 50, 77, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .trust-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .trust-stat strong {
+            font-size: 1.5rem;
+            color: #20324D;
+            font-weight: 700;
+        }
+
+        .trust-stat span {
+            font-size: 0.875rem;
+            color: #7BC8A4;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 4rem 0;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .hero-buttons .btn {
+                width: 100%;
+            }
+
+            .hero-trust {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        /* Section Styling */
+        section {
+            padding: 5rem 0;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section:nth-child(2) { animation-delay: 0.1s; }
+        section:nth-child(3) { animation-delay: 0.2s; }
+        section:nth-child(4) { animation-delay: 0.3s; }
+        section:nth-child(5) { animation-delay: 0.4s; }
+        section:nth-child(6) { animation-delay: 0.5s; }
+        section:nth-child(7) { animation-delay: 0.6s; }
+        section:nth-child(8) { animation-delay: 0.7s; }
+
+        /* Problem Solution Section */
+        .problem-solution {
+            background-color: white;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-header h2 {
+            color: #20324D;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.125rem;
+            color: #20242B;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .problem-card {
+            background-color: #F1EEE8;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+
+        .problem-card h3 {
+            color: #20324D;
+            margin-bottom: 1rem;
+        }
+
+        .problem-card p {
+            color: #20242B;
+            font-size: 0.95rem;
+        }
+
+        .solution-highlight {
+            background: linear-gradient(135deg, #7BC8A4 0%, #20324D 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+
+        .solution-highlight h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .solution-highlight p {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.125rem;
+        }
+
+        /* The 4 Engines Section */
+        .engines {
+            background-color: #FAF7F2;
+        }
+
+        .engines-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .engine-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(123, 200, 164, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .engine-card:hover {
+            border-color: #7BC8A4;
+            box-shadow: 0 12px 24px rgba(123, 200, 164, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .engine-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #F1EEE8;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: #20324D;
+            font-size: 1.75rem;
+        }
+
+        .engine-card h3 {
+            color: #20324D;
+            margin-bottom: 1rem;
+        }
+
+        .engine-card p {
+            color: #20242B;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            background-color: white;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            position: relative;
+            padding-left: 4rem;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50px;
+            height: 50px;
+            background-color: #20324D;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .step:nth-child(1)::before {
+            content: '1';
+            background: linear-gradient(135deg, #20324D 0%, #7BC8A4 100%);
+        }
+
+        .step:nth-child(2)::before {
+            content: '2';
+            background: linear-gradient(135deg, #7BC8A4 0%, #D9A05B 100%);
+        }
+
+        .step:nth-child(3)::before {
+            content: '3';
+            background: linear-gradient(135deg, #D9A05B 0%, #20324D 100%);
+        }
+
+        .step h3 {
+            color: #20324D;
+            margin-bottom: 0.75rem;
+        }
+
+        .step p {
+            color: #20242B;
+            font-size: 0.95rem;
+        }
+
+        /* Freedom Number Calculator */
+        .calculator {
+            background: linear-gradient(135deg, #20324D 0%, #2a3f5f 100%);
+            color: white;
+        }
+
+        .calculator h2,
+        .calculator h3 {
+            color: white;
+        }
+
+        .calculator-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 3rem;
+            align-items: center;
+        }
+
+        .calculator-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
+            padding: 0.875rem 1rem;
+            border: 1px solid rgba(123, 200, 164, 0.3);
+            border-radius: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #7BC8A4;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .calculator-results {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(123, 200, 164, 0.2);
+        }
+
+        .result-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #7BC8A4;
+        }
+
+        .result-description {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Pricing Section */
+        .pricing {
+            background-color: #FAF7F2;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            border: 2px solid #F1EEE8;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pricing-card:hover {
+            border-color: #7BC8A4;
+            box-shadow: 0 12px 32px rgba(123, 200, 164, 0.2);
+            transform: translateY(-8px);
+        }
+
+        .pricing-card.featured {
+            border-color: #20324D;
+            background: linear-gradient(135deg, #20324D 0%, #2a3f5f 100%);
+            color: white;
+            transform: scale(1.05);
+            position: relative;
+        }
+
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #D9A05B;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .pricing-card.featured h3,
+        .pricing-card.featured .price {
+            color: white;
+        }
+
+        .pricing-card h3 {
+            color: #20324D;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-description {
+            font-size: 0.875rem;
+            color: #20242B;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .pricing-card.featured .pricing-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #20324D;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-period {
+            font-size: 0.875rem;
+            color: #20242B;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-card.featured .price-period {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .features-list li {
+            padding: 0.75rem 0;
+            padding-left: 1.75rem;
+            position: relative;
+            color: #20242B;
+            font-size: 0.95rem;
+        }
+
+        .pricing-card.featured .features-list li {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .features-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #7BC8A4;
+            font-weight: 700;
+        }
+
+        .pricing-card button {
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .pricing-card.featured .btn-primary {
+            background-color: #7BC8A4;
+            color: #20324D;
+        }
+
+        .pricing-card.featured .btn-primary:hover {
+            background-color: #D9A05B;
+            color: white;
+        }
+
+        .early-access-section {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(32, 50, 77, 0.1);
+        }
+
+        .early-access-section h3 {
+            color: #20324D;
+            margin-bottom: 1rem;
+        }
+
+        .early-access-section p {
+            color: #20242B;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            background-color: white;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background-color: #F1EEE8;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            border-left: 4px solid #7BC8A4;
+        }
+
+        .testimonial-quote {
+            font-size: 1rem;
+            font-style: italic;
+            color: #20242B;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .testimonial-author {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .testimonial-name {
+            font-weight: 600;
+            color: #20324D;
+            margin-bottom: 0.25rem;
+        }
+
+        .testimonial-role {
+            font-size: 0.875rem;
+            color: #20242B;
+        }
+
+        .testimonial-metric {
+            font-weight: 600;
+            color: #7BC8A4;
+            font-size: 0.875rem;
+            margin-top: 0.75rem;
+        }
+
+        /* FAQ Section */
+        .faq {
+            background-color: #FAF7F2;
+        }
+
+        .faq-items {
+            max-width: 700px;
+            margin: 3rem auto 0;
+        }
+
+        .faq-item {
+            background-color: white;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(32, 50, 77, 0.1);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background-color: #F1EEE8;
+        }
+
+        .faq-question h3 {
+            color: #20324D;
+            margin: 0;
+            flex: 1;
+        }
+
+        .faq-toggle {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7BC8A4;
+            font-weight: 700;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 1.5rem;
+            color: #20242B;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #20324D;
+            color: white;
+            padding: 3rem 0 2rem;
+            border-top: 1px solid rgba(123, 200, 164, 0.2);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .footer-section a {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #7BC8A4;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(123, 200, 164, 0.2);
+            padding-top: 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.875rem;
+        }
+
+        .footer-contact {
+            font-size: 0.95rem;
+        }
+
+        .footer-contact a {
+            color: #7BC8A4;
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utility Classes */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(32, 50, 77, 0.2), transparent);
+            margin: 3rem 0;
+        }
+
+        /* Scroll Animation */
+        .scroll-fade {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .scroll-fade.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Auth Button */
+        .btn-login {
+            background: transparent;
+            border: 1px solid #20324D;
+            color: #20324D;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: #20324D;
+            color: #FAF7F2;
+        }
+
+        /* Auth Modal */
+        .auth-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(32, 50, 77, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-overlay.active {
+            display: flex;
+        }
+
+        .auth-modal {
+            background: #FCFBF8;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 440px;
+            padding: 2.5rem;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(32, 50, 77, 0.2);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .auth-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #667085;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .auth-close:hover {
+            background: #F1EEE8;
+        }
+
+        .auth-modal h2 {
+            font-size: 1.5rem;
+            color: #20324D;
+            margin-bottom: 0.25rem;
+        }
+
+        .auth-modal .auth-subtitle {
+            color: #667085;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.25rem 0;
+            color: #667085;
+            font-size: 0.8rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #E7E3DC;
+        }
+
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .auth-input-group label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #20242B;
+        }
+
+        .auth-input-group input {
+            padding: 0.75rem 1rem;
+            border: 1px solid #E7E3DC;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s;
+            background: #FCFBF8;
+        }
+
+        .auth-input-group input:focus {
+            outline: none;
+            border-color: #7BC8A4;
+            box-shadow: 0 0 0 3px rgba(123, 200, 164, 0.15);
+        }
+
+        .auth-btn-google {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #E7E3DC;
+            border-radius: 0.5rem;
+            background: #FCFBF8;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #20242B;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .auth-btn-google:hover {
+            background: #F1EEE8;
+            border-color: #20324D;
+        }
+
+        .auth-btn-submit {
+            width: 100%;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: #20324D;
+            color: #FCFBF8;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .auth-btn-submit:hover {
+            background: #2a4263;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.85rem;
+            color: #667085;
+        }
+
+        .auth-footer a {
+            color: #7BC8A4;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-footer a:hover {
+            color: #20324D;
+        }
+
+        .auth-terms {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #667085;
+            margin-top: 1rem;
+            line-height: 1.4;
+        }
+
+        .auth-terms a {
+            color: #667085;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">LA<span>DO</span></a>
+                <nav>
+                    <a href="#engines">Features</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#faq">FAQ</a>
+                    <button class="btn-login" onclick="openAuthModal('login')">Log In</button>
+                    <button class="btn btn-primary" style="padding: 0.625rem 1.25rem; font-size: 0.875rem;" onclick="openAuthModal('signup')">Get Started</button>
+                    <a href="platform.html" style="font-size: 0.7rem; color: #667085; padding: 4px 8px; border: 1px dashed #E7E3DC; border-radius: 4px;" title="Skip auth (dev only)">DEV</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Auth Modal -->
+    <div class="auth-overlay" id="authOverlay" onclick="if(event.target===this)closeAuthModal()">
+        <div class="auth-modal">
+            <button class="auth-close" onclick="closeAuthModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+
+            <!-- Login View -->
+            <div id="loginView">
+                <h2>Welcome back</h2>
+                <p class="auth-subtitle">Log in to continue your freedom journey</p>
+
+                <button class="auth-btn-google" onclick="handleGoogleAuth()">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    Continue with Google
+                </button>
+
+                <div class="auth-divider">or</div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="auth-input-group">
+                        <label>Email address</label>
+                        <input type="email" id="loginEmail" placeholder="you@example.com" required />
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required />
+                    </div>
+                    <button type="submit" class="auth-btn-submit">Log In</button>
+                </form>
+
+                <p class="auth-footer">
+                    Don't have an account? <a onclick="switchAuthView('signup')">Sign up</a>
+                </p>
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #E7E3DC; text-align: center;">
+                    <a href="platform.html" style="font-size: 0.75rem; color: #667085; text-decoration: none; padding: 6px 12px; border: 1px dashed #E7E3DC; border-radius: 4px; display: inline-block;">Skip to Platform (Dev Mode)</a>
+                </div>
+            </div>
+
+            <!-- Signup View -->
+            <div id="signupView" style="display: none;">
+                <h2>Start your escape</h2>
+                <p class="auth-subtitle">Create your free account to begin</p>
+
+                <button class="auth-btn-google" onclick="handleGoogleAuth()">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    Continue with Google
+                </button>
+
+                <div class="auth-divider">or</div>
+
+                <form onsubmit="handleSignup(event)">
+                    <div class="auth-input-group">
+                        <label>Full name</label>
+                        <input type="text" id="signupName" placeholder="Tommy Costa" required />
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Email address</label>
+                        <input type="email" id="signupEmail" placeholder="you@example.com" required />
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password (8+ characters)" required minlength="8" />
+                    </div>
+                    <button type="submit" class="auth-btn-submit">Create Account</button>
+                </form>
+
+                <p class="auth-terms">
+                    By signing up, you agree to our <a href="terms-of-service.html">Terms</a> and <a href="privacy-policy.html">Privacy Policy</a>
+                </p>
+
+                <p class="auth-footer">
+                    Already have an account? <a onclick="switchAuthView('login')">Log in</a>
+                </p>
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #E7E3DC; text-align: center;">
+                    <a href="onboarding.html" style="font-size: 0.75rem; color: #667085; text-decoration: none; padding: 6px 12px; border: 1px dashed #E7E3DC; border-radius: 4px; display: inline-block;">Skip to Onboarding (Dev Mode)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Powered by Claude AI
+                    </div>
+
+                    <h1>Your AI-Powered Escape Plan</h1>
+                    <p>Stop trading time for money. Build a side hustle that replaces your salary, then quit your 9-to-5 with confidence.</p>
+
+                    <div class="hero-buttons">
+                        <a href="https://buy.stripe.com/5kQeVf7IUeul2nBcHJasg03" class="btn btn-primary">Get Early Access — $10</a>
+                        <button class="btn btn-ghost" onclick="document.getElementById('engines').scrollIntoView({behavior: 'smooth'})">Learn More</button>
+                    </div>
+
+                    <div class="hero-trust">
+                        <div class="trust-stat">
+                            <strong>Atlas</strong>
+                            <span>Your AI Freedom Agent</span>
+                        </div>
+                        <div class="trust-stat">
+                            <strong>4 Engines</strong>
+                            <span>Discover → Build → Formalize → Protect</span>
+                        </div>
+                        <div class="trust-stat">
+                            <strong>$10 Deposit</strong>
+                            <span>Applied to first month</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem Solution Section -->
+        <section class="problem-solution">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Still Trading Time for Money?</h2>
+                    <p>Most people work harder than they ever have, yet feel further from financial freedom. Sound familiar?</p>
+                </div>
+
+                <div class="problem-grid">
+                    <div class="problem-card scroll-fade">
+                        <h3>Stuck in 9-to-5</h3>
+                        <p>Your salary caps your income. One job, one paycheck, no leverage.</p>
+                    </div>
+                    <div class="problem-card scroll-fade">
+                        <h3>No Escape Plan</h3>
+                        <p>You want out, but don't know where to start. Analysis paralysis wins.</p>
+                    </div>
+                    <div class="problem-card scroll-fade">
+                        <h3>Overwhelmed & Alone</h3>
+                        <p>Side hustle advice is scattered. You need a real strategy and accountability.</p>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="solution-highlight scroll-fade">
+                    <h3>LADO Changes That</h3>
+                    <p>Meet Atlas: your AI freedom agent. Get a personalized escape plan. Execute it step by step. Hit your Freedom Number. Leave your job.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- The 4 Engines Section -->
+        <section id="engines" class="engines">
+            <div class="container">
+                <div class="section-header">
+                    <h2>The 4 Engines</h2>
+                    <p>Atlas powers your journey through four connected capabilities</p>
+                </div>
+
+                <div class="engines-grid">
+                    <div class="engine-card scroll-fade">
+                        <div class="engine-icon">🔍</div>
+                        <h3>Discover</h3>
+                        <p>Find side hustles matched to your skills, schedule, and market opportunity. Get data on startup cost, time to first dollar, and realistic income potential.</p>
+                    </div>
+                    <div class="engine-card scroll-fade">
+                        <div class="engine-icon">⚙️</div>
+                        <h3>Build / Execute</h3>
+                        <p>Turn ideas into action. Break goals into executable missions. Get AI-drafted content, templates, and accountability. Run automations on schedule.</p>
+                    </div>
+                    <div class="engine-card scroll-fade">
+                        <div class="engine-icon">📊</div>
+                        <h3>Formalize</h3>
+                        <p>Transform your side hustle into a legitimate business. P&L statements, business plans, tax summaries, and loan packages. Ready to fundraise or go official.</p>
+                    </div>
+                    <div class="engine-card scroll-fade">
+                        <div class="engine-icon">🛡️</div>
+                        <h3>Protect</h3>
+                        <p>Track your Freedom Number. Detect burnout early. Stay healthy and sane. We alert you when you're quit-ready and help you make the final leap.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <h2>How It Works</h2>
+                    <p>Three steps from "I'm stuck" to "I'm free"</p>
+                </div>
+
+                <div class="steps-container">
+                    <div class="step scroll-fade">
+                        <h3>Tell Atlas Your Situation</h3>
+                        <p>Share your current job, available hours, skills, expenses, and what freedom looks like to you. Your Freedom Number gets calculated automatically.</p>
+                    </div>
+                    <div class="step scroll-fade">
+                        <h3>Get Your Personalized Plan</h3>
+                        <p>Atlas analyzes your profile and generates a custom escape plan. Pick your first side hustle. Get missions, timelines, and execution details.</p>
+                    </div>
+                    <div class="step scroll-fade">
+                        <h3>Execute With AI by Your Side</h3>
+                        <p>Follow missions. Get reminders. Let Atlas draft content, track progress, and celebrate wins. When your hustle hits your Freedom Number, you're ready to quit.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Freedom Number Calculator -->
+        <section id="calculator" class="calculator">
+            <div class="container">
+                <div class="section-header" style="margin-bottom: 0;">
+                    <h2>Calculate Your Freedom Number</h2>
+                    <p>The monthly revenue your side hustle needs to generate for you to safely quit</p>
+                </div>
+
+                <div class="calculator-content">
+                    <div class="calculator-inputs">
+                        <div class="input-group">
+                            <label for="monthly-income">Current Monthly Gross Income</label>
+                            <input type="number" id="monthly-income" placeholder="e.g., 5000" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="monthly-expenses">Monthly Expenses</label>
+                            <input type="number" id="monthly-expenses" placeholder="e.g., 3500" min="0">
+                        </div>
+                    </div>
+
+                    <div class="calculator-results">
+                        <div class="result-item">
+                            <div class="result-label">Your Freedom Number</div>
+                            <div class="result-value" id="freedom-number">$0</div>
+                            <div class="result-description">Monthly revenue needed to replace your salary</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">6-Month Runway Target</div>
+                            <div class="result-value" id="runway-target">$0</div>
+                            <div class="result-description">Emergency savings buffer to build first</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">75% Comfort Target</div>
+                            <div class="result-value" id="comfort-target">$0</div>
+                            <div class="result-description">Optional higher income cushion</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="pricing">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Simple, Transparent Pricing</h2>
+                    <p>Pick the plan that matches your ambition</p>
+                </div>
+
+                <div class="pricing-cards">
+                    <div class="pricing-card scroll-fade">
+                        <h3>Starter</h3>
+                        <p class="pricing-description">Perfect for testing your first side hustle idea</p>
+                        <div class="price">$29<span style="font-size: 1rem; color: #20242B;">/mo</span></div>
+                        <div class="price-period">Billed monthly</div>
+                        <ul class="features-list">
+                            <li>1 active hustle</li>
+                            <li>Basic missions & tasks</li>
+                            <li>Weekly AI check-ins</li>
+                            <li>Email support</li>
+                            <li>Access to knowledge base</li>
+                        </ul>
+                        <button class="btn btn-secondary" onclick="window.location.href='https://buy.stripe.com/5kQeVf7IUeul2nBcHJasg03'">Start Free Trial</button>
+                    </div>
+
+                    <div class="pricing-card featured scroll-fade">
+                        <h3>Pro</h3>
+                        <p class="pricing-description">For serious side hustlers ready to scale</p>
+                        <div class="price">$49<span style="font-size: 1rem; opacity: 0.9;">/mo</span></div>
+                        <div class="price-period">Billed monthly</div>
+                        <ul class="features-list">
+                            <li>Unlimited hustles</li>
+                            <li>Full execution automation</li>
+                            <li>Marketplace integrations</li>
+                            <li>Telegram bot + notifications</li>
+                            <li>Priority email support</li>
+                            <li>Custom business analytics</li>
+                        </ul>
+                        <button class="btn btn-primary" onclick="window.location.href='https://buy.stripe.com/5kQeVf7IUeul2nBcHJasg03'">Get Early Access</button>
+                    </div>
+
+                    <div class="pricing-card scroll-fade">
+                        <h3>Unlimited</h3>
+                        <p class="pricing-description">White-glove support for serious entrepreneurs</p>
+                        <div class="price">$99<span style="font-size: 1rem; color: #20242B;">/mo</span></div>
+                        <div class="price-period">Billed monthly</div>
+                        <ul class="features-list">
+                            <li>Everything in Pro</li>
+                            <li>White-glove onboarding</li>
+                            <li>Custom automations</li>
+                            <li>API access</li>
+                            <li>Dedicated account manager</li>
+                            <li>Monthly strategy calls</li>
+                        </ul>
+                        <button class="btn btn-secondary" onclick="window.location.href='https://buy.stripe.com/5kQeVf7IUeul2nBcHJasg03'">Contact Sales</button>
+                    </div>
+                </div>
+
+                <div class="early-access-section scroll-fade">
+                    <h3>🎁 Early Access Offer</h3>
+                    <p>Lock in founding member pricing. Your $10 deposit is applied to your first month, regardless of plan.</p>
+                    <a href="https://buy.stripe.com/5kQeVf7IUeul2nBcHJasg03" class="btn btn-primary">Claim Early Access — $10</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="testimonials">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Real People, Real Results</h2>
+                    <p>Side hustlers who escaped their 9-to-5</p>
+                </div>
+
+                <div class="testimonials-grid">
+                    <div class="testimonial-card scroll-fade">
+                        <div class="testimonial-quote">"LADO gave me a clear exit plan. Within 6 months, my Etsy store hit $3,500/month. I quit my marketing job and never looked back."</div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-name">Sarah M.</div>
+                            <div class="testimonial-role">Former Marketing Manager</div>
+                            <div class="testimonial-metric">→ Escaped in 6 months with $21K/year revenue</div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card scroll-fade">
+                        <div class="testimonial-quote">"The missions and accountability were game-changing. Atlas kept me focused on ONE hustle until it worked. No more shiny object syndrome."</div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-name">James K.</div>
+                            <div class="testimonial-role">Software Engineer</div>
+                            <div class="testimonial-metric">→ Freelance copywriting now pays his bills</div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card scroll-fade">
+                        <div class="testimonial-quote">"The freedom number concept finally made the escape plan real and measurable. Knowing exactly what I needed to hit made all the difference."</div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-name">Maya P.</div>
+                            <div class="testimonial-role">Sales Operations</div>
+                            <div class="testimonial-metric">→ Digital course now generates $4K/month</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="faq">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Frequently Asked Questions</h2>
+                    <p>Everything you need to know</p>
+                </div>
+
+                <div class="faq-items">
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>What is a Freedom Number?</h3>
+                            <div class="faq-toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Your Freedom Number is the monthly revenue your side hustle needs to generate to safely replace your current job income. It equals your monthly expenses — because that's the only number that matters for your lifestyle. Supporting targets include a 6-month savings runway and an optional 75% salary cushion for comfort.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>How does Atlas help me?</h3>
+                            <div class="faq-toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Atlas is your AI freedom agent. It analyzes your profile (skills, hours, finances, interests) and recommends side hustles matched to you. Then it breaks your goals into executable missions, drafts content, tracks progress, detects burnout, and alerts you when you're quit-ready. Think of it as a business advisor + accountability partner + motivational coach, all in one.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>Can I use LADO while working full-time?</h3>
+                            <div class="faq-toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Absolutely. That's the whole point. LADO is designed specifically for people with 9-to-5 jobs who want to build something on the side. Atlas helps you optimize your available hours (early mornings, evenings, weekends) and creates a schedule that doesn't burn you out. Most users launch their first side hustle while keeping their day job.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>What if I don't know what side hustle to start?</h3>
+                            <div class="faq-toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            <p>That's exactly what the Discover engine does. Share your skills, available hours, interests, and budget constraints. Atlas will surface 3-5 side hustle ideas ranked by time-to-first-dollar, startup cost, and market opportunity. Each recommendation includes a launch checklist, so you know exactly what to do next.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3>Is the $10 deposit refundable?</h3>
+                            <div class="faq-toggle">+</div>
+                        </div>
+                        <div class="faq-answer">
+                            <p>The $10 deposit is a one-time payment that locks in founding member pricing. It's applied directly to your first month's subscription, so your actual cost is $19 for Starter, $39 for Pro, or $89 for Unlimited in month one. We offer a 7-day full refund policy if LADO isn't right for you — refunds apply to the deposit only if requested within 7 days of purchase.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>LADO</h3>
+                    <p>Your AI-powered escape plan from the 9-to-5.</p>
+                    <p style="margin-top: 1rem; font-size: 0.875rem; color: rgba(255, 255, 255, 0.6);">Built by Costa Spirits LLC © 2026</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Product</h3>
+                    <a href="#engines">Features</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#faq">FAQ</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="terms-of-service.html">Terms of Service</a>
+                    <a href="refund-policy.html">Refund Policy</a>
+                </div>
+                <div class="footer-section footer-contact">
+                    <h3>Contact</h3>
+                    <p>Have questions? We're here to help.</p>
+                    <a href="mailto:tommy@costaspirits.com">tommy@costaspirits.com</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>LADO is powered by Claude AI. Built with care for people who want to escape their 9-to-5.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Freedom Number Calculator
+        const monthlyIncomeInput = document.getElementById('monthly-income');
+        const monthlyExpensesInput = document.getElementById('monthly-expenses');
+        const freedomNumberDisplay = document.getElementById('freedom-number');
+        const runwayTargetDisplay = document.getElementById('runway-target');
+        const comfortTargetDisplay = document.getElementById('comfort-target');
+
+        function calculateFreedomNumber() {
+            const income = parseFloat(monthlyIncomeInput.value) || 0;
+            const expenses = parseFloat(monthlyExpensesInput.value) || 0;
+
+            const freedomNumber = expenses;
+            const runwayTarget = expenses * 6;
+            const comfortTarget = income * 0.75;
+
+            freedomNumberDisplay.textContent = '$' + freedomNumber.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            runwayTargetDisplay.textContent = '$' + runwayTarget.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            comfortTargetDisplay.textContent = '$' + comfortTarget.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        monthlyIncomeInput.addEventListener('input', calculateFreedomNumber);
+        monthlyExpensesInput.addEventListener('input', calculateFreedomNumber);
+
+        // FAQ Toggle
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            faqItem.classList.toggle('active');
+        }
+
+        // Scroll Fade Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-fade').forEach(el => observer.observe(el));
+
+        // Auth Modal Functions
+        function openAuthModal(view) {
+            document.getElementById('authOverlay').classList.add('active');
+            switchAuthView(view);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function switchAuthView(view) {
+            document.getElementById('loginView').style.display = view === 'login' ? 'block' : 'none';
+            document.getElementById('signupView').style.display = view === 'signup' ? 'block' : 'none';
+        }
+
+        function handleGoogleAuth() {
+            // Placeholder: will wire to Supabase Auth with Google OAuth
+            alert('Google authentication will be connected to Supabase. Redirecting to onboarding...');
+            window.location.href = 'onboarding.html';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            // Placeholder: will wire to Supabase Auth
+            console.log('Login:', { email });
+            window.location.href = 'platform.html';
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            // Placeholder: will wire to Supabase Auth
+            console.log('Signup:', { name, email });
+            window.location.href = 'onboarding.html';
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeAuthModal();
+        });
+    </script>
+</body>
+</html>
