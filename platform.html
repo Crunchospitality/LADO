@@ -755,6 +755,11 @@ const Sidebar = ({ activeSection, onNavigate, user }) => {
           <Settings />
           Settings
         </button>
+
+        <div onClick={async () => { await _supabase.auth.signOut(); window.location.href = 'index.html'; }} style={{ padding: '12px 16px', cursor: 'pointer', color: '#667085', fontSize: '13px', fontFamily: fontStack, borderTop: '1px solid #E7E3DC', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Log Out
+        </div>
       </div>
     </div>
   );
@@ -762,6 +767,28 @@ const Sidebar = ({ activeSection, onNavigate, user }) => {
 
 // ============ HOME SECTION ============
 const HomeSection = ({ user }) => {
+  const [freedomMetrics, setFreedomMetrics] = useState(null);
+
+  useEffect(() => {
+    if (!user) return;
+    const fm = user.monthlyExpenses;
+    const runway = fm * 6;
+    const salary75 = Math.round(user.monthlyIncome * 0.75);
+    const savProg = runway > 0 ? Math.min(100, Math.round((user.currentSavings / runway) * 100)) : 0;
+    const incProg = fm > 0 ? Math.min(100, Math.round((user.sideHustleIncome / fm) * 100)) : 0;
+    const qrs = Math.round((savProg + incProg) / 2);
+    setFreedomMetrics({
+      freedomNumber: fm,
+      runwayTarget: runway,
+      salaryTarget: salary75,
+      savingsProgress: savProg,
+      incomeProgress: incProg,
+      quitReadyScore: qrs
+    });
+  }, [user]);
+
+  if (!freedomMetrics) return <div>Loading metrics...</div>;
+
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: "24px" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -770,26 +797,26 @@ const HomeSection = ({ user }) => {
             <div style={{ fontSize: "12px", color: tokens.color.muted, marginBottom: "8px", textTransform: "uppercase", fontWeight: 600 }}>
               Freedom Number
             </div>
-            <div style={{ fontSize: "32px", fontWeight: 700, color: tokens.color.primary }}>$3,800</div>
+            <div style={{ fontSize: "32px", fontWeight: 700, color: tokens.color.primary }}>${freedomMetrics.freedomNumber}</div>
             <div style={{ fontSize: "12px", color: tokens.color.muted, marginTop: "4px" }}>/month to quit</div>
           </div>
 
           <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
             <div>
               <div style={{ fontSize: "12px", fontWeight: 500, marginBottom: "4px", color: tokens.color.text }}>6-Mo Runway</div>
-              <ProgressBar value={9500} max={22800} color="success" />
-              <div style={{ fontSize: "11px", color: tokens.color.muted, marginTop: "4px" }}>$9,500 / $22,800</div>
+              <ProgressBar value={user.currentSavings} max={freedomMetrics.runwayTarget} color="success" />
+              <div style={{ fontSize: "11px", color: tokens.color.muted, marginTop: "4px" }}>${user.currentSavings} / ${freedomMetrics.runwayTarget}</div>
             </div>
 
             <div>
               <div style={{ fontSize: "12px", fontWeight: 500, marginBottom: "4px", color: tokens.color.text }}>75% Salary Target</div>
-              <ProgressBar value={1200} max={3900} color="warning" />
-              <div style={{ fontSize: "11px", color: tokens.color.muted, marginTop: "4px" }}>$1,200 / $3,900/mo</div>
+              <ProgressBar value={user.sideHustleIncome} max={freedomMetrics.salaryTarget} color="warning" />
+              <div style={{ fontSize: "11px", color: tokens.color.muted, marginTop: "4px" }}>${user.sideHustleIncome} / ${freedomMetrics.salaryTarget}/mo</div>
             </div>
 
             <div>
               <div style={{ fontSize: "12px", fontWeight: 500, marginBottom: "4px", color: tokens.color.text }}>Quit-Ready</div>
-              <ProgressBar value={34} max={100} color="info" />
+              <ProgressBar value={freedomMetrics.quitReadyScore} max={100} color="info" />
             </div>
           </div>
         </Card>
@@ -882,8 +909,24 @@ const ExecuteSection = ({ onForward }) => {
   const [forwardConfig, setForwardConfig] = useState({ channel: "etsy", price: "", deliverables: [] });
   const [analysisType, setAnalysisType] = useState(null);
   const [analysisUrl, setAnalysisUrl] = useState("");
+  const [liveMissions, setLiveMissions] = useState(null);
+  const [liveTasks, setLiveTasks] = useState(null);
 
-  const missions = [
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) return;
+        const uid = session.user.id;
+        const { data: m } = await _supabase.from('missions').select('*, mission_steps(*)').eq('user_id', uid).order('created_at', { ascending: false });
+        const { data: t } = await _supabase.from('tasks').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+        if (m) setLiveMissions(m);
+        if (t) setLiveTasks(t);
+      } catch (e) { console.log('Using demo data for Execute'); }
+    })();
+  }, []);
+
+  const missions = liveMissions || [
     { id: 1, name: "Launch Etsy Print-on-Demand Store", status: "Active", progress: 67, steps: 12, dueDate: "Apr 15", engine: "Build", deliverables: ["5 product designs", "SEO-optimized listings", "Product photography"] },
     { id: 2, name: "Get First 10 UGC Clients", status: "Active", progress: 15, steps: 8, dueDate: "Apr 30", engine: "Build", deliverables: ["Portfolio samples", "Outreach templates", "Rate card"] },
     { id: 3, name: "Build 6-Month Emergency Fund", status: "Active", progress: 42, steps: null, dueDate: "Sep 1", engine: "Protect", deliverables: [] },
@@ -1560,8 +1603,20 @@ const MarketplaceSection = ({ forwardedItems = [], onPublish }) => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("products");
   const [selectedForwarded, setSelectedForwarded] = useState(null);
+  const [liveProducts, setLiveProducts] = useState(null);
 
-  const products = [
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) return;
+        const { data: p } = await _supabase.from('marketplace_products').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false });
+        if (p) setLiveProducts(p);
+      } catch (e) { console.log('Using demo data for Marketplace'); }
+    })();
+  }, []);
+
+  const products = liveProducts || [
     { name: "Custom Pet Phone Case", channel: "Etsy", status: "Active", orders: 23, revenue: 437 },
     { name: "Motivational Quote Mug", channel: "Etsy", status: "Active", orders: 15, revenue: 210 },
     { name: "Social Media 101 Course", channel: "Gumroad", status: "Draft", orders: 0, revenue: 0 },
@@ -1732,6 +1787,18 @@ const MarketplaceSection = ({ forwardedItems = [], onPublish }) => {
 const FormalizeSection = () => {
   const [activeTab, setActiveTab] = useState("documents");
   const [selectedDocType, setSelectedDocType] = useState(null);
+  const [liveLedger, setLiveLedger] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) return;
+        const { data: l } = await _supabase.from('ledger_entries').select('*').eq('user_id', session.user.id).order('date', { ascending: false });
+        if (l) setLiveLedger(l);
+      } catch (e) { console.log('Using demo data for Formalize'); }
+    })();
+  }, []);
 
   const documents = [
     { name: "March 2026 P&L", type: "P&L", hustle: "Etsy Store", status: "Ready", date: "Mar 28" },
@@ -1740,7 +1807,7 @@ const FormalizeSection = () => {
     { name: "Branding Guide v1", type: "Branding", hustle: "All", status: "Ready", date: "Mar 15" },
   ];
 
-  const ledgerEntries = [
+  const ledgerEntries = liveLedger || [
     { date: "Mar 28", desc: "Etsy sales — phone cases", category: "Sales", amount: 87.5, type: "Income" },
     { date: "Mar 27", desc: "Printful order fulfillment", category: "COGS", amount: -32.0, type: "Expense" },
     { date: "Mar 26", desc: "Canva Pro subscription", category: "Tools", amount: -13.0, type: "Expense" },
